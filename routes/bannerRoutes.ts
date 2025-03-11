@@ -4,13 +4,13 @@ import {
   GetBanners,
   DeleteBanner,
 } from "../controller/bannerController";
-import multer, { StorageEngine } from "multer";
+import multer from "multer";
 import path from "path";
 import fs from "fs";
 
 // Define types for the request and file
 type UploadRequest = Request & {
-  files: Express.Multer.File[];
+  files: Express.Multer.File[]; // Change this line to use the correct type
 };
 
 const router = express.Router();
@@ -20,7 +20,7 @@ const tempDir = path.join(__dirname, "..", "uploads", "temp");
 fs.mkdirSync(tempDir, { recursive: true });
 
 // Configure multer
-const storage: StorageEngine = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: function (
     req: Request,
     file: Express.Multer.File,
@@ -28,7 +28,11 @@ const storage: StorageEngine = multer.diskStorage({
   ) {
     callback(null, tempDir);
   },
-  filename: function (req: UploadRequest, file: Express.Multer.File, cb) {
+  filename: function (
+    req: UploadRequest,
+    file: Express.Multer.File,
+    cb: (error: Error | null, filename: string) => void
+  ) {
     cb(null, `temp-${Date.now()}${path.extname(file.originalname)}`);
   },
 });
