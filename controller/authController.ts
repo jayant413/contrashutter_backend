@@ -96,7 +96,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 86400000, // Changed maxAge to 1 day in milliseconds
-      sameSite: "lax",
+      sameSite: "none",
     });
 
     res.status(200).json({
