@@ -39,6 +39,8 @@ app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
+
+console.log("Allowed origins:", process.env.ALLOWED_ORIGINS);
 app.use(
   cors({
     origin: process.env.ALLOWED_ORIGINS, // Replace with your frontend URL
