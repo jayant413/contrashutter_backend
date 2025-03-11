@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Package from "../models/package";
 import Service from "../models/service";
 import Event from "../models/event";
+import mongoose from "mongoose";
 
 // 🆕 Get All Packages
 export const getAllPackages = async (
@@ -116,6 +117,32 @@ export const createPackage = async (
     res.status(500).json({ message: "Error creating package", error });
   }
 };
+interface ICardDetail {
+  product_name: string;
+  quantity: number;
+}
+
+interface IPackageDetail {
+  title: string;
+  subtitle: string[];
+}
+
+interface IBillDetail {
+  type: string;
+  amount: number;
+}
+
+interface IUpdateData {
+  serviceId: mongoose.Schema.Types.ObjectId;
+  eventId: mongoose.Schema.Types.ObjectId;
+  name: string;
+  price: number;
+  booking_price: number;
+  card_details: ICardDetail[];
+  package_details: IPackageDetail[];
+  bill_details: IBillDetail[];
+  category?: string;
+}
 
 export const updatePackage = async (
   req: Request,
@@ -141,22 +168,21 @@ export const updatePackage = async (
       return;
     }
 
-    // Format the data to match the schema
-    const updateData = {
+    const updateData: IUpdateData = {
       serviceId,
       eventId,
       name,
       price: Number(price),
       booking_price: Number(booking_price),
-      card_details: card_details.map((card: any) => ({
+      card_details: card_details.map((card: ICardDetail) => ({
         product_name: card.product_name,
         quantity: card.quantity,
       })),
-      package_details: package_details.map((detail: any) => ({
+      package_details: package_details.map((detail: IPackageDetail) => ({
         title: detail.title,
         subtitle: detail.subtitle,
       })),
-      bill_details: bill_details.map((bill: any) => ({
+      bill_details: bill_details.map((bill: IBillDetail) => ({
         type: bill.type,
         amount: bill.amount,
       })),
@@ -176,11 +202,11 @@ export const updatePackage = async (
       message: "Package updated successfully",
       package: updatedPackage,
     });
-  } catch (error: any) {
+  } catch (error: Error | mongoose.Error | unknown) {
     console.error("Error updating package:", error);
     res.status(500).json({
       message: "Error updating package",
-      error: error.message,
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };

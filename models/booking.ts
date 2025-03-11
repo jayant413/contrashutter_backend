@@ -93,7 +93,7 @@ export interface IBooking extends Document {
   ordered?: boolean;
   userId: mongoose.Types.ObjectId;
   basic_info?: IBasicInfo;
-  form_details?: Record<string, any>;
+  form_details?: Record<string, string | number | boolean>;
   event_details?: IEventDetails;
   delivery_address?: IDeliveryAddress;
   payment_details?: IPaymentDetails;

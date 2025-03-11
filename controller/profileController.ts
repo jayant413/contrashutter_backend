@@ -3,6 +3,7 @@ import User from "../models/userModel";
 import Package from "../models/package";
 import { AuthRequest } from "../middlewares/authMiddleware";
 import mongoose from "mongoose";
+
 // Middleware request type with user
 interface CustomRequest extends Request {
   user?: { id: string; email: string; role: string };
@@ -32,7 +33,7 @@ export const checkLogin = async (
       userExistsInDb: true,
       user: user,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error verifying login:", error);
     res
       .status(500)
@@ -73,9 +74,12 @@ export const updateProfile = async (
         email: req.user?.email,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error updating profile:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
 
@@ -99,11 +103,14 @@ export const getUserById = async (
     }
 
     res.status(200).json(user);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching user:", error);
     res
       .status(500)
-      .json({ message: "Error fetching user", error: error.message });
+      .json({
+        message: "Error fetching user",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
   }
 };
 
@@ -111,10 +118,13 @@ export const getServiceProviders = async (req: Request, res: Response) => {
   try {
     const serviceProviders = await User.find({ role: "Service Provider" });
     res.status(200).json(serviceProviders);
-  } catch (error) {
+  } catch (error: unknown) {
     res
       .status(500)
-      .json({ message: "Error fetching service providers", error });
+      .json({
+        message: "Error fetching service providers",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
   }
 };
 
@@ -139,8 +149,13 @@ export const addToWishlist = async (req: AuthRequest, res: Response) => {
     } else {
       res.status(400).json({ message: "Package already in wishlist" });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Error adding wishlist", error });
+  } catch (error: unknown) {
+    res
+      .status(500)
+      .json({
+        message: "Error adding wishlist",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
   }
 };
 
@@ -155,8 +170,13 @@ export const removeFromWishlist = async (req: AuthRequest, res: Response) => {
     user.wishlist = user.wishlist.filter((id) => id.toString() !== packageId);
     await user.save();
     res.status(200).json({ message: "Package removed from wishlist" });
-  } catch (error) {
-    res.status(500).json({ message: "Error removing wishlist", error });
+  } catch (error: unknown) {
+    res
+      .status(500)
+      .json({
+        message: "Error removing wishlist",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
   }
 };
 
@@ -188,8 +208,13 @@ export const addNotification = async (req: AuthRequest, res: Response) => {
     });
     await user.save();
     res.status(200).json({ message: "Notification added" });
-  } catch (error) {
-    res.status(500).json({ message: "Error adding notification", error });
+  } catch (error: unknown) {
+    res
+      .status(500)
+      .json({
+        message: "Error adding notification",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
   }
 };
 
@@ -203,8 +228,13 @@ export const clearNotifications = async (req: AuthRequest, res: Response) => {
     user.notifications = [];
     await user.save();
     res.status(200).json({ message: "Notifications cleared" });
-  } catch (error) {
-    res.status(500).json({ message: "Error clearing notifications", error });
+  } catch (error: unknown) {
+    res
+      .status(500)
+      .json({
+        message: "Error clearing notifications",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
   }
 };
 
@@ -226,7 +256,12 @@ export const readNotification = async (req: AuthRequest, res: Response) => {
     notification.read = true;
     await user.save();
     res.status(200).json({ message: "Notification read" });
-  } catch (error) {
-    res.status(500).json({ message: "Error reading notification", error });
+  } catch (error: unknown) {
+    res
+      .status(500)
+      .json({
+        message: "Error reading notification",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
   }
 };

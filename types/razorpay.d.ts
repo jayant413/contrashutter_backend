@@ -10,17 +10,16 @@ declare module "razorpay" {
     receipt: string;
     payment_capture?: number;
   }
-
   interface RazorpayInstance {
     orders: {
-      create(options: OrderOptions): Promise<any>;
+      create(options: OrderOptions): Promise<RazorpayOrder>;
     };
   }
 
   class Razorpay {
     constructor(options: RazorpayOptions);
     orders: {
-      create(options: OrderOptions): Promise<any>;
+      create(options: OrderOptions): Promise<RazorpayOrder>;
     };
   }
 

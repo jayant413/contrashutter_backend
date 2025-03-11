@@ -34,7 +34,7 @@ export const createServicePartner = async (req: Request, res: Response) => {
     }
 
     res.status(200).json(savedPartner);
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof mongoose.Error.ValidationError) {
       res.status(400).json({
         message: "Validation error: " + error.message,
@@ -53,10 +53,10 @@ export const getAllServicePartners = async (req: Request, res: Response) => {
   try {
     const servicePartners = await ServicePartner.find().populate("partner");
     res.json(servicePartners);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: error.message || "Error fetching service partners" });
+  } catch (error: unknown) {
+    res.status(500).json({
+      message: (error as Error).message || "Error fetching service partners",
+    });
   }
 };
 
@@ -72,10 +72,10 @@ export const getServicePartnerById = async (req: Request, res: Response) => {
         .json({ success: false, message: "Service Partner not found" });
     }
     res.json(servicePartner);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: error.message || "Error fetching service partner" });
+  } catch (error: unknown) {
+    res.status(500).json({
+      message: (error as Error).message || "Error fetching service partner",
+    });
   }
 };
 
@@ -116,17 +116,16 @@ export const updateServicePartner = async (req: Request, res: Response) => {
     }
 
     res.json(servicePartner);
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle mongoose duplicate key error for updates
-    if (error.code === 11000) {
-      const field = Object.keys(error.keyPattern)[0];
+    if (error instanceof mongoose.Error) {
       res.status(400).json({
-        message: `This ${field} is already registered. Please use a different ${field}.`,
+        message: `This Service Partner is already registered. Please use a different Service Partner.`,
       });
     } else {
-      res
-        .status(500)
-        .json({ message: error.message || "Error updating service partner" });
+      res.status(500).json({
+        message: (error as Error).message || "Error updating service partner",
+      });
     }
   }
 };
@@ -143,7 +142,7 @@ export const deleteServicePartner = async (req: Request, res: Response) => {
         .json({ success: false, message: "Service Partner not found" });
     }
     res.status(200).json({ success: true, message: "Service Partner deleted" });
-  } catch (error) {
+  } catch (error: unknown) {
     res.status(500).json({ success: false, error: (error as Error).message });
   }
 };
@@ -164,9 +163,9 @@ export const getServicePartnerByPartnerId = async (
         .json({ success: false, message: "Service Partner not found" });
     }
     res.json(servicePartner);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: error.message || "Error fetching service partner" });
+  } catch (error: unknown) {
+    res.status(500).json({
+      message: (error as Error).message || "Error fetching service partner",
+    });
   }
 };

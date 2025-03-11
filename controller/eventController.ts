@@ -4,7 +4,6 @@ import Event from "../models/event";
 import Service from "../models/service";
 import path from "path";
 import fs from "fs";
-import multer from "multer";
 
 // Define interface for Request with file
 interface RequestWithFile extends Request {
@@ -12,7 +11,7 @@ interface RequestWithFile extends Request {
 }
 
 export const createEvent = async (
-  req: RequestWithFile,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
@@ -55,10 +54,16 @@ export const createEvent = async (
     await service.save();
 
     res.status(200).json(newEvent);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: "Error creating event", error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: "Error creating event", error: error.message });
+    } else {
+      res
+        .status(500)
+        .json({ message: "Error creating event", error: "Unknown error" });
+    }
   }
 };
 
@@ -67,10 +72,16 @@ export const getEvents = async (req: Request, res: Response): Promise<void> => {
   try {
     const events = await Event.find().populate("serviceId");
     res.json(events);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: "Error fetching events", error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: "Error fetching events", error: error.message });
+    } else {
+      res
+        .status(500)
+        .json({ message: "Error fetching events", error: "Unknown error" });
+    }
   }
 };
 
@@ -83,10 +94,16 @@ export const getEventById = async (
 
     const event = await Event.findById(eventId).populate("packageIds");
     res.json(event);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: "Error fetching event", error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: "Error fetching event", error: error.message });
+    } else {
+      res
+        .status(500)
+        .json({ message: "Error fetching event", error: "Unknown error" });
+    }
   }
 };
 
@@ -112,10 +129,16 @@ export const getEventsByServiceId = async (
     }
 
     res.json(events);
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: "Error fetching events", error: error.message });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: "Error fetching events", error: error.message });
+    } else {
+      res
+        .status(500)
+        .json({ message: "Error fetching events", error: "Unknown error" });
+    }
   }
 };
 
@@ -165,10 +188,16 @@ export const updateEvent = async (
 
     await event.save();
     res.status(200).json({ message: "Event updated successfully", event });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating event:", error);
-    res
-      .status(500)
-      .json({ message: "Error updating event", error: error.message });
+    if (error instanceof Error) {
+      res
+        .status(500)
+        .json({ message: "Error updating event", error: error.message });
+    } else {
+      res
+        .status(500)
+        .json({ message: "Error updating event", error: "Unknown error" });
+    }
   }
 };

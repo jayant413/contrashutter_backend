@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Service from "../models/service";
+import mongoose from "mongoose";
 
 // Create a new Service (Only Name, Empty Events Array)
 export const createService = async (
@@ -19,10 +20,12 @@ export const createService = async (
     await newService.save();
 
     res.status(200).json(newService);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     res
       .status(500)
-      .json({ message: "Error creating service", error: error.message });
+      .json({ message: "Error creating service", error: errorMessage });
   }
 };
 
@@ -34,10 +37,12 @@ export const getServices = async (
   try {
     const services = await Service.find().populate("events");
     res.json(services);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     res
       .status(500)
-      .json({ message: "Error fetching services", error: error.message });
+      .json({ message: "Error fetching services", error: errorMessage });
   }
 };
 
@@ -55,10 +60,12 @@ export const getServiceById = async (
     }
 
     res.json(service);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     res
       .status(500)
-      .json({ message: "Error fetching service", error: error.message });
+      .json({ message: "Error fetching service", error: errorMessage });
   }
 };
 
@@ -96,9 +103,12 @@ export const updateService = async (
 
     // After all updates are completed, send the response
     res.status(200).json({ message: "Services updated successfully" });
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: "Error updating services", error: error.message });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    res.status(500).json({
+      message: "Error updating services",
+      error: errorMessage,
+    });
   }
 };

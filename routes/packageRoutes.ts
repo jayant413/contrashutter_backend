@@ -1,5 +1,11 @@
 import express from "express";
-import { createPackage, getAllPackages, getPackageById, getPackagesByEventId, updatePackage } from "../controller/package.controller";
+import {
+  createPackage,
+  getAllPackages,
+  getPackageById,
+  getPackagesByEventId,
+  updatePackage,
+} from "../controller/packageController";
 
 const router = express.Router();
 

@@ -3,18 +3,23 @@ import Banner from "../models/banner";
 import fs from "fs";
 import path from "path";
 
+// Extend the Request interface to include files
+interface RequestWithFiles extends Request {
+  files?: Express.Multer.File[];
+}
+
 export const UploadBanner = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    // Validate request
-    if (!req.files?.length) {
+    const files = req.files as Express.Multer.File[]; // ✅ Type assertion
+
+    if (!files || files.length === 0) {
       res.status(400).json({ message: "No files uploaded" });
       return;
     }
 
-    const files = req.files as Express.Multer.File[];
     const indexes = JSON.parse(req.body.indexes || "[]");
 
     if (indexes.length !== files.length) {
@@ -54,12 +59,20 @@ export const UploadBanner = async (
       message: "Banners uploaded successfully",
       banners: savedBanners,
     });
-  } catch (error: any) {
-    console.error("Upload error:", error);
-    res.status(500).json({
-      message: "Error uploading banners",
-      error: error.message,
-    });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Upload error:", error);
+      res.status(500).json({
+        message: "Error uploading banners",
+        error: error.message,
+      });
+    } else {
+      console.error("Upload error:", error);
+      res.status(500).json({
+        message: "Error uploading banners",
+        error: "Unknown error",
+      });
+    }
   }
 };
 

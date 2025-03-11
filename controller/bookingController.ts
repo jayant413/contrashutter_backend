@@ -89,11 +89,14 @@ export const createBooking = async (
     await newBooking.save();
 
     res.status(200).json(newBooking);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating booking:", error);
-    res
-      .status(500)
-      .json({ message: "Error creating booking", error: error.message });
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    res.status(500).json({
+      message: "Error creating booking",
+      error: errorMessage,
+    });
   }
 };
 
@@ -116,7 +119,7 @@ export const getBookings = async (
       role: string;
     };
 
-    let bookings: any[] = [];
+    let bookings: IBooking[] | unknown = [];
     const populateOptions = ["servicePartner", "userId", "invoices"];
 
     if (decoded.role === "Service Provider") {
@@ -142,15 +145,17 @@ export const getBookings = async (
     }
 
     res.json(bookings);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching bookings:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     res
       .status(500)
-      .json({ message: "Error fetching bookings", error: error.message });
+      .json({ message: "Error fetching bookings", error: errorMessage });
   }
 };
 
-// Get a Booking by ID (Accepts any linked data if applicable)
+// Get a Booking by ID (Accepts linked data if applicable)
 export const getBookingById = async (
   req: Request,
   res: Response
@@ -168,11 +173,13 @@ export const getBookingById = async (
     }
 
     res.json(booking);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching booking:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     res
       .status(500)
-      .json({ message: "Error fetching booking", error: error.message });
+      .json({ message: "Error fetching booking", error: errorMessage });
   }
 };
 
@@ -501,11 +508,13 @@ export const updateBookingById = async (
       message: "Booking updated successfully",
       updatedBooking,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating booking:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     res
       .status(500)
-      .json({ message: "Error updating booking", error: error.message });
+      .json({ message: "Error updating booking", error: errorMessage });
   }
 };
 
@@ -529,10 +538,12 @@ export const getBookingsByUserId = async (
     }
 
     res.status(200).json(bookings);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching user bookings:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     res
       .status(500)
-      .json({ message: "Error fetching user bookings", error: error.message });
+      .json({ message: "Error fetching user bookings", error: errorMessage });
   }
 };

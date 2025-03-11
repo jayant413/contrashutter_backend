@@ -19,7 +19,7 @@ interface IBillDetail {
 }
 
 // Interface for Package Document
-interface IPackage extends Document {
+export interface IPackage extends Document {
   serviceId: mongoose.Schema.Types.ObjectId;
   eventId: mongoose.Schema.Types.ObjectId;
   name: string;
@@ -38,19 +38,25 @@ const PackageSchema = new Schema<IPackage>({
   name: { type: String, required: true },
   price: { type: Number, required: true },
   booking_price: { type: Number, required: false },
-  card_details: [{
-    product_name: { type: String, required: false },
-    quantity: { type: Number, required: false }
-  }],
-  package_details: [{
-    title: { type: String, required: false },
-    subtitle: [{ type: String, required: false }]
-  }],
-  bill_details: [{
-    type: { type: String, required: false },
-    amount: { type: Number, required: false }
-  }],
-  category: { type: String, required: false }
+  card_details: [
+    {
+      product_name: { type: String, required: false },
+      quantity: { type: Number, required: false },
+    },
+  ],
+  package_details: [
+    {
+      title: { type: String, required: false },
+      subtitle: [{ type: String, required: false }],
+    },
+  ],
+  bill_details: [
+    {
+      type: { type: String, required: false },
+      amount: { type: Number, required: false },
+    },
+  ],
+  category: { type: String, required: false },
 });
 
 // Export the Package model

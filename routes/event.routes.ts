@@ -5,7 +5,7 @@ import {
   getEventsByServiceId,
   updateEvent,
   getEventById,
-} from "../controller/event.controller";
+} from "../controller/eventController";
 import upload from "../middlewares/multerMiddleware";
 
 const router = express.Router();

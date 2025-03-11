@@ -50,14 +50,12 @@ const ServicePartnerSchema: Schema = new Schema(
 );
 
 // Add better error handling for duplicate key errors
-ServicePartnerSchema.post("save", function (error: any, doc: any, next: any) {
-  if (error.code === 11000) {
-    const field = Object.keys(error.keyPattern)[0];
-    next(new Error(`${field} already exists. Please use a different value.`));
-  } else {
+ServicePartnerSchema.post(
+  "save",
+  function (error: mongoose.Error, next: (err?: Error) => void) {
     next(error);
   }
-});
+);
 
 const ServicePartner =
   mongoose.models.ServicePartner ||
