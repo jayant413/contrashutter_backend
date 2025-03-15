@@ -7,6 +7,11 @@ export interface IUser extends Document {
   password: string;
   role: "Service Provider" | "Client" | "Admin";
   status: "Pending" | "Active" | "Inactive";
+  dateOfBirth?: string;
+  aadharCard?: string;
+  panCard?: string;
+  address?: string;
+  profileImage?: string;
   notifications: Array<{
     _id?: mongoose.Types.ObjectId;
     title: string;
@@ -36,6 +41,11 @@ const userSchema = new Schema<IUser>({
     enum: ["Service Provider", "Client", "Admin"],
     default: "Client",
   },
+  dateOfBirth: { type: String },
+  aadharCard: { type: String },
+  panCard: { type: String },
+  address: { type: String },
+  profileImage: { type: String },
   notifications: [
     {
       title: { type: String },

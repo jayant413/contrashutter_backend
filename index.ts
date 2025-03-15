@@ -8,8 +8,8 @@ import userRoutes from "./routes/userRoutes";
 import path from "path";
 
 import connectDB from "./config/db";
-import serviceRoutes from "./routes/service.routes";
-import eventRoutes from "./routes/event.routes";
+import serviceRoutes from "./routes/serviceRoutes";
+import eventRoutes from "./routes/eventRoutes";
 import packageRoutes from "./routes/packageRoutes";
 import bookingRoutes from "./routes/bookingRoutes"; // Booking routes import
 import paymentRoutes from "./routes/paymentRoutes"; // Payment routes import

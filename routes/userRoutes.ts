@@ -10,14 +10,21 @@ import {
   addNotification,
   clearNotifications,
   readNotification,
+  createSupportTicket,
+  upload,
 } from "../controller/profileController";
 
 const router = express.Router();
 
 router.get("/checkLogin", authenticateToken, checkLogin);
-router.post("/updateProfile", authenticateToken, updateProfile);
-router.get("/user/:userId", getUserById); // Use GET and pass userId in the URL
-router.get("/me", authenticateToken, checkLogin); // ✅ Use `checkLogin` for fetching user details
+router.post(
+  "/updateProfile",
+  authenticateToken,
+  upload.single("profileImage"),
+  updateProfile
+);
+router.get("/user/:userId", getUserById);
+router.get("/me", authenticateToken, checkLogin);
 router.get("/serviceProvider", getServiceProviders);
 router.post("/addToWishlist", authenticateToken, addToWishlist);
 router.post("/removeFromWishlist", authenticateToken, removeFromWishlist);
@@ -28,5 +35,6 @@ router.get(
   authenticateToken,
   readNotification
 );
+router.post("/support", authenticateToken, createSupportTicket);
 
 export default router;
