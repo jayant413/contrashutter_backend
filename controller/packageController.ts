@@ -163,7 +163,7 @@ export const updatePackage = async (
     } = req.body;
 
     // Basic validation
-    if (!serviceId || !eventId || !name || !price || !booking_price) {
+    if (!serviceId || !eventId || !name || !price) {
       res.status(400).json({ message: "Required fields are missing" });
       return;
     }

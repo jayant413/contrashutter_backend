@@ -33,30 +33,30 @@ export interface IPackage extends Document {
 
 // Package Schema
 const PackageSchema = new Schema<IPackage>({
-  serviceId: { type: Schema.Types.ObjectId, ref: "Service", required: true },
-  eventId: { type: Schema.Types.ObjectId, ref: "Event", required: true },
-  name: { type: String, required: true },
-  price: { type: Number, required: true },
-  booking_price: { type: Number, required: false },
+  serviceId: { type: Schema.Types.ObjectId, ref: "Service" },
+  eventId: { type: Schema.Types.ObjectId, ref: "Event" },
+  name: { type: String },
+  price: { type: Number },
+  booking_price: { type: Number },
   card_details: [
     {
-      product_name: { type: String, required: false },
-      quantity: { type: Number, required: false },
+      product_name: { type: String },
+      quantity: { type: Number },
     },
   ],
   package_details: [
     {
-      title: { type: String, required: false },
-      subtitle: [{ type: String, required: false }],
+      title: { type: String },
+      subtitle: [{ type: String }],
     },
   ],
   bill_details: [
     {
-      type: { type: String, required: false },
-      amount: { type: Number, required: false },
+      type: { type: String },
+      amount: { type: Number },
     },
   ],
-  category: { type: String, required: false },
+  category: { type: String },
 });
 
 // Export the Package model
