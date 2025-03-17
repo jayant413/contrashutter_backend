@@ -9,7 +9,7 @@ interface ICardDetail {
 // Interface for Package Details
 interface IPackageDetail {
   title: string;
-  subtitle: string[];
+  subtitles: string[];
 }
 
 // Interface for Bill Details
@@ -47,7 +47,7 @@ const PackageSchema = new Schema<IPackage>({
   package_details: [
     {
       title: { type: String },
-      subtitle: [{ type: String }],
+      subtitles: [{ type: String }],
     },
   ],
   bill_details: [

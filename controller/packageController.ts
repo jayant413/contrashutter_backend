@@ -124,7 +124,7 @@ interface ICardDetail {
 
 interface IPackageDetail {
   title: string;
-  subtitle: string[];
+  subtitles: string[];
 }
 
 interface IBillDetail {
@@ -180,7 +180,7 @@ export const updatePackage = async (
       })),
       package_details: package_details.map((detail: IPackageDetail) => ({
         title: detail.title,
-        subtitle: detail.subtitle,
+        subtitles: detail.subtitles,
       })),
       bill_details: bill_details.map((bill: IBillDetail) => ({
         type: bill.type,
