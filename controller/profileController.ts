@@ -11,7 +11,9 @@ import fs from "fs";
 // Configure multer for image upload
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = "uploads/user";
+    const uploadsPath =
+      process.env.NODE_ENV === "production" ? "../uploads" : "uploads";
+    const uploadDir = path.join(uploadsPath, "user");
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }

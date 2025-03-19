@@ -12,7 +12,9 @@ const storage: StorageEngine = multer.diskStorage({
     file: Express.Multer.File,
     cb: FileCallback
   ) {
-    cb(null, "./uploads/images"); // Directory to store images
+    const uploadsPath =
+      process.env.NODE_ENV === "production" ? "../uploads" : "uploads";
+    cb(null, path.join(uploadsPath, "images")); // Directory to store images
   },
   filename: function (
     req: Request,

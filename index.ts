@@ -40,7 +40,6 @@ app.use((req, res, next) => {
   next();
 });
 
-console.log("Allowed origins:", process.env.ALLOWED_ORIGINS);
 app.use(
   cors({
     origin: process.env.ALLOWED_ORIGINS, // Replace with your frontend URL
@@ -48,7 +47,11 @@ app.use(
     credentials: true,
   })
 );
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+const uploadsPath =
+  process.env.NODE_ENV === "production" ? "../uploads" : "uploads";
+
+app.use("/uploads", express.static(path.join(__dirname, uploadsPath)));
 
 connectDB();
 
