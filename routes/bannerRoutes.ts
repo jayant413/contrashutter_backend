@@ -15,10 +15,6 @@ type UploadRequest = Request & {
 
 const router = express.Router();
 
-// Ensure temp upload directory exists
-const tempDir = path.join(__dirname, "../uploads/temp");
-fs.mkdirSync(tempDir, { recursive: true });
-
 // Configure multer
 const storage = multer.diskStorage({
   destination: function (
@@ -26,6 +22,13 @@ const storage = multer.diskStorage({
     file: Express.Multer.File,
     callback: (error: Error | null, destination: string) => void
   ) {
+    // Ensure temp upload directory exists
+    const tempDir = path.join(__dirname, "../uploads/banners");
+
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+
     callback(null, tempDir);
   },
   filename: function (
@@ -33,7 +36,7 @@ const storage = multer.diskStorage({
     file: Express.Multer.File,
     cb: (error: Error | null, filename: string) => void
   ) {
-    cb(null, `temp-${Date.now()}${path.extname(file.originalname)}`);
+    cb(null, "temp-" + Date.now() + path.extname(file.originalname));
   },
 });
 

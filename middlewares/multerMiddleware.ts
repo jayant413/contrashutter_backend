@@ -1,6 +1,7 @@
 import multer, { StorageEngine } from "multer";
 import path from "path";
 import { Request } from "express";
+import fs from "fs";
 
 // Define types for the file and callback
 type FileCallback = (error: Error | null, filename: string) => void;
@@ -13,6 +14,9 @@ const storage: StorageEngine = multer.diskStorage({
     cb: FileCallback
   ) {
     const uploadDir = path.join(__dirname, "../uploads/images");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
     cb(null, uploadDir); // Directory to store images
   },
   filename: function (
