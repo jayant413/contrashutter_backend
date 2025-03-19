@@ -48,13 +48,13 @@ app.use(
   })
 );
 
-const uploadsPath =
-  process.env.NODE_ENV === "production" ? "../uploads" : "uploads";
-
-app.use("/uploads", express.static(path.join(__dirname, uploadsPath)));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 connectDB();
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the Contrashutter APIs");
+});
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);

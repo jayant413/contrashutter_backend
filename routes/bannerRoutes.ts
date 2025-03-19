@@ -16,9 +16,7 @@ type UploadRequest = Request & {
 const router = express.Router();
 
 // Ensure temp upload directory exists
-const uploadsPath =
-  process.env.NODE_ENV === "production" ? "../uploads" : "uploads";
-const tempDir = path.join(__dirname, uploadsPath, "temp");
+const tempDir = path.join(__dirname, "../uploads/temp");
 fs.mkdirSync(tempDir, { recursive: true });
 
 // Configure multer
