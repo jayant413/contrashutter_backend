@@ -52,7 +52,7 @@ export const createBooking = async (
       payablePrice: totalPrice,
       paidAmount: installmentAmount,
       dueAmount: dueAmount,
-      paymentType: "Partial",
+      paymentType: dueAmount > 0 ? "3 Installments" : "Full Payment",
       paymentStatus: dueAmount > 0 ? "Pending" : "Completed",
       paymentDate: new Date(),
     };

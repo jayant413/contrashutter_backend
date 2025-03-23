@@ -67,7 +67,7 @@ interface IPackageDetail {
   paidAmount: number;
   installment: 1 | 3;
   card_details?: ICardDetail[];
-  package_details?: { title: string; subtitle: string[] }[];
+  package_details?: { title: string; subtitles: string[] }[];
   bill_details?: { type: string; amount: number }[];
   category?: string;
 }
@@ -186,7 +186,7 @@ const bookingSchema: Schema = new Schema<IBooking>(
       package_details: [
         {
           title: { type: String },
-          subtitle: [{ type: String }],
+          subtitles: [{ type: String }],
         },
       ],
       bill_details: [
