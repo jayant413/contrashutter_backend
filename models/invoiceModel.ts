@@ -8,7 +8,7 @@ const invoiceSchema = new Schema(
       ref: "Booking",
       required: true,
     },
-    paymentType: { type: Number, enum: [1, 3], required: true },
+    paymentType: { type: Number, enum: [1, 2, 3], required: true },
     paymentMethod: { type: String, required: true },
     payablePrice: { type: Number, required: true },
     paidAmount: { type: Number, required: true },

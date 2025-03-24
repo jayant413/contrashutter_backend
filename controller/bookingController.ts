@@ -42,7 +42,12 @@ export const createBooking = async (
     const { package_details, payment_details } = req.body;
     const totalPrice = package_details.price;
     const installmentType = Number(payment_details.paymentType);
-    const installmentAmount = Math.ceil(totalPrice / installmentType);
+    const installmentAmount =
+      installmentType === 1
+        ? totalPrice
+        : installmentType === 3
+        ? Math.ceil(totalPrice * 0.3)
+        : Math.ceil(totalPrice / installmentType);
     const dueAmount = totalPrice - installmentAmount;
 
     // Create payment details
@@ -72,7 +77,7 @@ export const createBooking = async (
     // Create initial invoice
     const invoice = new Invoice({
       bookingId: newBooking._id,
-      paymentType: installmentType,
+      paymentType: 1,
       paymentMethod: payment_details.paymentMethod || "Razorpay",
       payablePrice: totalPrice,
       paidAmount: installmentAmount,
@@ -220,7 +225,7 @@ export const updateBookingById = async (
         // Create new invoice for the payment
         const invoice = new Invoice({
           bookingId: booking._id,
-          paymentType: booking.payment_details?.installment,
+          paymentType: 3,
           paymentMethod: updateData.payment_details.paymentMethod || "Razorpay",
           payablePrice: booking.payment_details?.payablePrice,
           paidAmount: booking.payment_details?.dueAmount,
@@ -232,7 +237,7 @@ export const updateBookingById = async (
 
         await invoice.save();
 
-        dataToUpdate.invoices?.unshift(invoice._id);
+        dataToUpdate.invoices?.push(invoice._id);
         dataToUpdate.payment_details = {
           ...dataToUpdate.payment_details,
           paidAmount: booking.payment_details?.payablePrice || 0,
@@ -284,12 +289,11 @@ export const updateBookingById = async (
       // Create new invoice for the payment
       const invoice = new Invoice({
         bookingId: booking._id,
-        paymentType: paymentDetails.installment,
+        paymentType: 2,
         paymentMethod: updateData.payment_details.paymentMethod || "Razorpay",
         payablePrice: paymentDetails.payablePrice,
-        paidAmount:
-          updateData.payment_details.paidAmount - paymentDetails.paidAmount,
-        dueAmount: updateData.payment_details.dueAmount,
+        paidAmount: paymentDetails.payablePrice * 0.4, // Set paid amount to 40% of payablePrice
+        dueAmount: paymentDetails.payablePrice * 0.3, // Set due amount to 30% of payablePrice
         paymentStatus: "Completed",
         razorpayOrderId: updateData.payment_details.razorpayOrderId,
         razorpayPaymentId: updateData.payment_details.razorpayPaymentId,

@@ -19,23 +19,21 @@ interface IServicePartner extends Document {
 
 const ServicePartnerSchema: Schema = new Schema(
   {
-    name: { type: String, required: true },
-    registrationNumber: { type: String, required: true },
-    contactPerson: { type: String, required: true },
-    contactNumber: { type: String, required: true },
-    email: { type: String, required: true },
-    businessAddress: { type: String, required: true },
-    employees: { type: String, required: true },
-    experience: { type: String, required: true },
-    projects: { type: String, required: true },
-    bankName: { type: String, required: true },
-    accountNumber: { type: String, required: true },
-    ifsc: { type: String, required: true },
+    name: { type: String },
+    registrationNumber: { type: String },
+    contactPerson: { type: String },
+    contactNumber: { type: String },
+    email: { type: String },
+    businessAddress: { type: String },
+    employees: { type: String },
+    experience: { type: String },
+    projects: { type: String },
+    bankName: { type: String },
+    accountNumber: { type: String },
+    ifsc: { type: String },
     partner: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
       ref: "User",
-      unique: true,
     },
     status: {
       type: String,
@@ -46,14 +44,6 @@ const ServicePartnerSchema: Schema = new Schema(
   {
     timestamps: true,
     collection: "servicepartners",
-  }
-);
-
-// Add better error handling for duplicate key errors
-ServicePartnerSchema.post(
-  "save",
-  function (error: mongoose.Error, next: (err?: Error) => void) {
-    next(error);
   }
 );
 

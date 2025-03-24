@@ -6,12 +6,19 @@ import mongoose from "mongoose";
 // Create a new service partner
 export const createServicePartner = async (req: Request, res: Response) => {
   const { userId } = req.params;
+
+  // Validate userId
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: "Invalid user ID" });
+  }
+
   try {
     const servicePartner = new ServicePartner({
       ...req.body,
       partner: new mongoose.Types.ObjectId(userId),
       status: "Pending",
     });
+
     const savedPartner = await servicePartner.save();
 
     await User.findByIdAndUpdate(

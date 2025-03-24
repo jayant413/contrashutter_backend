@@ -41,7 +41,11 @@ router.get("/test", async (req, res) => {
 });
 
 // Create a new service partner
-router.post("/:userId", authenticateToken, createServicePartner);
+router.post(
+  "/:userId",
+  authenticateToken,
+  createServicePartner as RequestHandler
+);
 
 // Get all service partners
 router.get("/", getAllServicePartners);
