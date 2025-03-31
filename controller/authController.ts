@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 
 import User from "../models/userModel";
 import nodemailer from "nodemailer";
+import { AuthRequest } from "../middlewares/authMiddleware";
 
 export const registerUser = async (
   req: Request,
@@ -158,5 +159,53 @@ export const contactUs = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     console.error("Contact form error:", error);
     res.status(500).json({ message: "Failed to send message" });
+  }
+};
+
+export const changePassword = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.status(401).json({ message: "Authentication required" });
+      return;
+    }
+
+    if (!currentPassword || !newPassword) {
+      res
+        .status(400)
+        .json({ message: "Current password and new password are required" });
+      return;
+    }
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    // Check if current password is correct
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      res.status(401).json({ message: "Current password is incorrect" });
+      return;
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
