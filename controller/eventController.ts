@@ -2,8 +2,16 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import Event from "../models/event";
 import Service from "../models/service";
-import path from "path";
+import formidable, { Fields, Files } from "formidable";
+import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Define interface for Request with file
 interface RequestWithFile extends Request {
@@ -15,45 +23,69 @@ export const createEvent = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { eventName, serviceId } = req.body;
-
-    if (!eventName || !serviceId) {
-      res
-        .status(400)
-        .json({ message: "Event name and serviceId are required" });
-      return;
-    }
-
-    const service = await Service.findById(serviceId);
-    if (!service) {
-      res.status(400).json({ message: "Service not found" });
-      return;
-    }
-
-    const newEvent = new Event({
-      eventName,
-      serviceId,
-      image: null,
+    // Configure formidable
+    const form = formidable({
+      keepExtensions: true,
     });
 
-    await newEvent.save();
-    const imagefile = req.file;
+    form.parse(req, async (err, fields: Fields, files: Files) => {
+      if (err) {
+        console.error("Form parsing error:", err);
+        res.status(500).json({ message: "Error parsing form data" });
+        return;
+      }
 
-    if (imagefile) {
-      const fileExt = path.extname(imagefile.originalname);
-      const newFilename = `${newEvent._id}${fileExt}`;
-      const newPath = path.join("uploads/images", newFilename);
+      const eventName = fields.eventName?.[0];
+      const serviceId = fields.serviceId?.[0];
+      const description = fields.description?.[0] || "";
 
-      fs.renameSync(imagefile.path, newPath);
+      if (!eventName || !serviceId) {
+        res
+          .status(400)
+          .json({ message: "Event name and serviceId are required" });
+        return;
+      }
 
-      newEvent.image = newPath;
+      const service = await Service.findById(serviceId);
+      if (!service) {
+        res.status(400).json({ message: "Service not found" });
+        return;
+      }
+
+      const newEvent = new Event({
+        eventName,
+        description,
+        serviceId,
+        image: null,
+      });
+
       await newEvent.save();
-    }
 
-    service.events.push(newEvent._id);
-    await service.save();
+      // Handle image upload
+      const imageFile = files.image?.[0];
 
-    res.status(200).json(newEvent);
+      if (imageFile) {
+        // Upload to Cloudinary
+        const uploadResult = await cloudinary.uploader.upload(
+          imageFile.filepath,
+          {
+            folder: "events",
+          }
+        );
+
+        // Clean up the temporary file
+        fs.unlinkSync(imageFile.filepath);
+
+        // Update event with image URL
+        newEvent.image = uploadResult.secure_url;
+        await newEvent.save();
+      }
+
+      service.events.push(newEvent._id);
+      await service.save();
+
+      res.status(200).json(newEvent);
+    });
   } catch (error: unknown) {
     if (error instanceof Error) {
       res
@@ -143,51 +175,93 @@ export const getEventsByServiceId = async (
 };
 
 export const updateEvent = async (
-  req: RequestWithFile,
+  req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { eventId } = req.params;
-    const { eventName } = req.body;
 
-    const event = await Event.findById(eventId);
-    if (!event) {
-      res.status(404).json({ message: "Event not found" });
-      return;
-    }
+    // Configure formidable
+    const form = formidable({
+      keepExtensions: true,
+    });
 
-    // Update event name if provided
-    if (eventName) {
-      event.eventName = eventName;
-    }
+    form.parse(req, async (err, fields: Fields, files: Files) => {
+      if (err) {
+        console.error("Form parsing error:", err);
+        res.status(500).json({ message: "Error parsing form data" });
+        return;
+      }
 
-    if (req.file) {
-      // Delete old image if it exists
-      if (event.image) {
-        const oldImagePath = path.join(__dirname, "..", event.image);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
+      const eventName = fields.eventName?.[0];
+      const description = fields.description?.[0];
+
+      const event = await Event.findById(eventId);
+      if (!event) {
+        res.status(404).json({ message: "Event not found" });
+        return;
+      }
+
+      // Update event fields if provided
+      if (eventName) {
+        event.eventName = eventName;
+      }
+
+      if (description !== undefined) {
+        event.description = description;
+      }
+
+      // Handle image upload
+      const imageFile = files.image?.[0];
+
+      if (imageFile) {
+        // If there's an existing image in Cloudinary, delete it
+        if (event.image && event.image.includes("cloudinary")) {
+          try {
+            // Extract public_id from Cloudinary URL
+            const urlParts = event.image.split("/");
+            // Find the folder name and file name
+            const folderIndex = urlParts.findIndex((part) => part === "events");
+            if (folderIndex !== -1 && folderIndex < urlParts.length - 1) {
+              // Get the parts that include the folder and the filename
+              const publicIdParts = urlParts.slice(folderIndex);
+              // Remove file extension if present and join with '/'
+              const publicId = publicIdParts.join("/").split(".")[0];
+
+              console.log(`Attempting to delete image: ${publicId}`);
+              // Delete from Cloudinary
+              const result = await cloudinary.uploader.destroy(publicId);
+              console.log(`Image deletion result: ${result}`);
+            } else {
+              console.warn(
+                "Could not extract proper public_id from URL:",
+                event.image
+              );
+            }
+          } catch (error) {
+            console.error("Error deleting previous image:", error);
+            // Continue with the upload even if deletion fails
+          }
         }
+
+        // Upload to Cloudinary
+        const uploadResult = await cloudinary.uploader.upload(
+          imageFile.filepath,
+          {
+            folder: "events",
+          }
+        );
+
+        // Clean up the temporary file
+        fs.unlinkSync(imageFile.filepath);
+
+        // Update event with new image URL
+        event.image = uploadResult.secure_url;
       }
 
-      // Save new image with a relative path
-      const fileExt = path.extname(req.file.originalname);
-      const newFilename = `${event._id}${fileExt}`;
-      const newPath = path.join("uploads", "images", newFilename);
-
-      // Ensure the uploads/images directory exists
-      const fullPath = path.join(__dirname, "..", newPath);
-      const dir = path.dirname(fullPath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-
-      fs.renameSync(req.file.path, fullPath);
-      event.image = newPath; // Store the relative path
-    }
-
-    await event.save();
-    res.status(200).json({ message: "Event updated successfully", event });
+      await event.save();
+      res.status(200).json({ message: "Event updated successfully", event });
+    });
   } catch (error: unknown) {
     console.error("Error updating event:", error);
     if (error instanceof Error) {

@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IEvent extends Document {
   eventName: string;
+  description: string;
   packageIds: mongoose.Types.ObjectId[];
   serviceId: mongoose.Types.ObjectId;
   image: string | null;
@@ -10,6 +11,7 @@ export interface IEvent extends Document {
 
 const EventSchema = new Schema<IEvent>({
   eventName: { type: String, required: true },
+  description: { type: String, required: false },
   formId: { type: Schema.Types.ObjectId, ref: "Form" },
   packageIds: [{ type: Schema.Types.ObjectId, ref: "Package" }],
   serviceId: { type: Schema.Types.ObjectId, ref: "Service", required: true },

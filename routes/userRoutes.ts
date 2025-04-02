@@ -11,18 +11,12 @@ import {
   clearNotifications,
   readNotification,
   createSupportTicket,
-  upload,
 } from "../controller/profileController";
 
 const router = express.Router();
 
 router.get("/checkLogin", authenticateToken, checkLogin);
-router.post(
-  "/updateProfile",
-  authenticateToken,
-  upload.single("profileImage"),
-  updateProfile
-);
+router.post("/updateProfile", authenticateToken, updateProfile);
 router.get("/user/:userId", getUserById);
 router.get("/me", authenticateToken, checkLogin);
 router.get("/serviceProvider", getServiceProviders);

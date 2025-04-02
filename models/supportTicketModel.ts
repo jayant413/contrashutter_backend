@@ -6,6 +6,7 @@ export interface ISupportTicket extends Document {
   priority: "Low" | "Medium" | "High";
   userId: mongoose.Types.ObjectId;
   status: "Open" | "In Progress" | "Resolved" | "Closed";
+  image?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +30,10 @@ const supportTicketSchema = new Schema<ISupportTicket>(
       type: String,
       enum: ["Open", "In Progress", "Resolved", "Closed"],
       default: "Open",
+    },
+    image: {
+      type: String,
+      required: false,
     },
   },
   { timestamps: true }

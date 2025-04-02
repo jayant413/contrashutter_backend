@@ -6,15 +6,13 @@ import {
   updateEvent,
   getEventById,
 } from "../controller/eventController";
-import upload from "../middlewares/multerMiddleware";
 
 const router = express.Router();
 
-router.post("/", upload.single("image"), createEvent); // Endpoint for creating an event
+router.post("/", createEvent); // Endpoint for creating an event
 router.get("/:eventId", getEventById);
 router.get("/", getEvents); // Get all events
 router.get("/service/:serviceId", getEventsByServiceId); // Get events by serviceId
-// Ensure this is your correct route setup
-router.put("/:eventId", upload.single("image"), updateEvent); // Update an event by ID
+router.put("/:eventId", updateEvent); // Update an event by ID
 
 export default router;

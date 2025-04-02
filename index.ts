@@ -17,6 +17,7 @@ import formRoutes from "./routes/formRoutes";
 
 import servicePartnerRoutes from "./routes/servicePartnerRoutes";
 import bannerRoutes from "./routes/bannerRoutes";
+import { v2 as cloudinary } from "cloudinary";
 
 // Import models (no need to export them globally)
 import "./models/package"; // Ensure Package model is loaded
@@ -28,6 +29,13 @@ import "./models/formModel";
 dotenv.config();
 
 const app = express();
+
+// Configure cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Middleware
 app.use(express.json());
