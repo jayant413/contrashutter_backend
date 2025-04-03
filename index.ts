@@ -14,6 +14,7 @@ import packageRoutes from "./routes/packageRoutes";
 import bookingRoutes from "./routes/bookingRoutes"; // Booking routes import
 import paymentRoutes from "./routes/paymentRoutes"; // Payment routes import
 import formRoutes from "./routes/formRoutes";
+import scheduleEndpointCall from "./cron/endpointCron"; // Import cron job
 
 import servicePartnerRoutes from "./routes/servicePartnerRoutes";
 import bannerRoutes from "./routes/bannerRoutes";
@@ -74,6 +75,9 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/service-partners", servicePartnerRoutes);
 app.use("/api/banner", bannerRoutes);
 app.use("/api/forms", formRoutes);
+
+// Initialize cron job
+scheduleEndpointCall();
 
 // Start Server
 const port = process.env.PORT || 8000;
