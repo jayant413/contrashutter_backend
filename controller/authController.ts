@@ -77,13 +77,13 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       ],
     }).populate("wishlist");
     if (!user) {
-      res.status(401).json({ message: "Invalid email/contact or role" });
+      res.status(401).json({ message: "Invalid credentials" });
       return;
     }
 
     const isMatch = await bcrypt.compare(loginPassword, user.password);
     if (!isMatch) {
-      res.status(401).json({ message: "Invalid password" });
+      res.status(401).json({ message: "Invalid credentials" });
       return;
     }
 
@@ -117,7 +117,7 @@ export const logoutUser = async (
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     path: "/",
   });
   res.status(200).json({ message: "Logout successful" });

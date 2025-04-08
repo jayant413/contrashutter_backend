@@ -24,15 +24,12 @@ const scheduleEndpointCall = () => {
 
   cron.schedule(cronExpression, async () => {
     try {
-      console.log(
-        `[${new Date().toISOString()}] Calling endpoint: ${ENDPOINT_URL}`
-      );
-      const response = await axios.get(ENDPOINT_URL);
-      console.log(
-        `[${new Date().toISOString()}] Endpoint call successful, status: ${
-          response.status
-        }`
-      );
+      await axios.get(ENDPOINT_URL);
+      //   console.log(
+      //     `[${new Date().toISOString()}] Endpoint call successful, status: ${
+      //       response.status
+      //     }`
+      //   );
     } catch (error) {
       console.error(
         `[${new Date().toISOString()}] Error calling endpoint:`,
