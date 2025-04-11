@@ -1,19 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 // Define interfaces for embedded objects
-interface IBasicInfo {
-  fullName?: string;
-  gender?: string;
-  dateOfBirth?: Date;
-  email?: string;
-  phoneNumber?: string;
-  alternatePhoneNumber?: string;
-  addressLine1?: string;
-  addressLine2?: string;
-  city?: string;
-  state?: string;
-  pincode?: string;
-}
 
 interface IEventDetails {
   eventName?: string;
@@ -92,7 +79,6 @@ export interface IBooking extends Document {
   booking_no: string;
   ordered?: boolean;
   userId: mongoose.Types.ObjectId;
-  basic_info?: IBasicInfo;
   form_details?: Record<string, string | number | boolean>;
   event_details?: IEventDetails;
   delivery_address?: IDeliveryAddress;
@@ -121,20 +107,6 @@ const bookingSchema: Schema = new Schema<IBooking>(
     booking_no: { type: String, unique: true },
     ordered: { type: Boolean, default: false },
     userId: { type: Schema.Types.ObjectId, required: true, ref: "User" },
-
-    basic_info: {
-      fullName: { type: String },
-      gender: { type: String },
-      dateOfBirth: { type: Date },
-      email: { type: String },
-      phoneNumber: { type: String },
-      alternatePhoneNumber: { type: String },
-      addressLine1: { type: String },
-      addressLine2: { type: String },
-      city: { type: String },
-      state: { type: String },
-      pincode: { type: String },
-    },
     form_details: { type: mongoose.Schema.Types.Mixed },
     event_details: {
       eventName: { type: String },
