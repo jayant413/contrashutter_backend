@@ -55,7 +55,7 @@ export const updateProfile = async (
       maxFileSize: 5 * 1024 * 1024, // 5MB limit
       filter: ({ name, originalFilename, mimetype }) => {
         // Keep only image files
-        if (name === "profileImage") {
+        if (name === "profileImage" || name === "coverImage") {
           return mimetype ? mimetype.includes("image") : false;
         }
         return true;
@@ -149,6 +149,50 @@ export const updateProfile = async (
         } catch (uploadError) {
           console.error("Error uploading to Cloudinary:", uploadError);
           res.status(500).json({ message: "Error uploading image" });
+          return;
+        }
+      }
+
+      // If there's a cover image, upload it to Cloudinary
+      const coverImage = files.coverImage?.[0];
+      if (coverImage && coverImage.filepath) {
+        try {
+          // If the user already has a cover image, delete it from Cloudinary
+          if (currentUser.coverImage) {
+            try {
+              // Extract public_id from the existing Cloudinary URL
+              const urlParts = currentUser.coverImage.split("/");
+              // Find the parts that contain the folder and ID
+              const folderWithId = urlParts
+                .slice(urlParts.indexOf("user_covers"))
+                .join("/");
+              // Remove file extension if present
+              const publicId = folderWithId.split(".")[0];
+
+              // Delete from Cloudinary
+              await cloudinary.uploader.destroy(publicId);
+              console.log(`Previous cover image deleted: ${publicId}`);
+            } catch (deleteError) {
+              console.error(
+                "Error deleting previous cover image:",
+                deleteError
+              );
+              // Continue with the upload even if deletion fails
+            }
+          }
+
+          // Upload to Cloudinary directly from the file path
+          const result = await cloudinary.uploader.upload(coverImage.filepath, {
+            public_id: `${userId}_cover`,
+            folder: "user_covers",
+            overwrite: true,
+          });
+
+          // Store Cloudinary URL in updateData
+          updateData.coverImage = result.secure_url;
+        } catch (uploadError) {
+          console.error("Error uploading to Cloudinary:", uploadError);
+          res.status(500).json({ message: "Error uploading cover image" });
           return;
         }
       }

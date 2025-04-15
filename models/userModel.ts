@@ -12,6 +12,7 @@ export interface IUser extends Document {
   panCard?: string;
   address?: string;
   profileImage?: string;
+  coverImage?: string;
   notifications: Array<{
     _id?: mongoose.Types.ObjectId;
     title: string;
@@ -46,6 +47,7 @@ const userSchema = new Schema<IUser>({
   panCard: { type: String },
   address: { type: String },
   profileImage: { type: String },
+  coverImage: { type: String },
   notifications: [
     {
       title: { type: String },
